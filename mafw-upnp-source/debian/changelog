@@ -1,9 +1,3 @@
-mafw-upnp-source (0.1.2009.35-3) unstable; urgency=low
-
-  * Version increased.
-
- -- Mika Tapojärvi <ext-mika.tapojarvi@nokia.com>  Fri, 21 Aug 2009 20:33:35 +0300
-
 mafw-upnp-source (0.1.2009.35-2) unstable; urgency=low
 
   * First MAFW Sales RC.
