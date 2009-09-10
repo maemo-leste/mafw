@@ -783,7 +783,6 @@ static void miwmd_free(struct GetPlItemData *mi)
 		g_hash_table_unref(mi->indexhash);
 	}
 	g_strfreev(mi->oids);
-        g_object_unref(mi->pls);
 	g_free(mi);
 }
 static void miwd_got_mdatas(MafwSource *self, GHashTable *metadatas,
@@ -1016,7 +1015,7 @@ gpointer mafw_playlist_get_items_md(MafwPlaylist *pls,
 		pldata = g_new0(struct GetPlItemData, 1);
 		pldata->remaining_reqs = 0;
 		pldata->cb = cb;
-		pldata->pls = g_object_ref(pls);
+		pldata->pls = pls;
 		pldata->cbarg = cbarg;
 		pldata->oids = pl_items;
 		pldata->free_cbarg = free_cbarg;

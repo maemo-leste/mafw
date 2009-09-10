@@ -570,7 +570,6 @@ on_renderer_combo_changed (GtkComboBox *widget,
         g_assert (model != NULL);
 
         if (!gtk_combo_box_get_active_iter (combo, &iter)) {
-		selected_renderer = NULL;
                 return;
         }
 
@@ -606,7 +605,7 @@ set_selected_renderer_xid (XID xid)
 	GValue value = { 0 };
 	
 	
-	if (xid == cur_xid || !selected_renderer)
+	if (xid == cur_xid)
 		return;
 	
 	cur_xid = xid;

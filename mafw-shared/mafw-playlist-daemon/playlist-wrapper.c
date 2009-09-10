@@ -225,7 +225,7 @@ handle_usecount_holder_msgs(DBusConnection *conn,
 
 				pls->use_count--;
 				pls_set_use_count(pls, pls->use_count);
-				pllist = g_list_remove(pllist, pls);
+				pllist = g_list_next(pllist);
 			}
 			_unregister_requestor(conn, oldname);
 		}

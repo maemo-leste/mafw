@@ -356,7 +356,6 @@ static void _tracker_metadata_cb(GPtrArray *results,
                 tracker_cache_values_add_results(mc->cache, results);
                 metadata_list = tracker_cache_build_metadata(mc->cache);
                 mc->mult_callback(metadata_list, NULL, mc->user_data);
-                g_list_foreach(metadata_list, (GFunc) g_hash_table_unref, NULL);
                 g_list_free(metadata_list);
         } else {
                 g_warning("Error while getting metadata: %s\n",
@@ -665,12 +664,10 @@ void ti_get_songs(const gchar *genre,
 
         /* Select default sort fields */
         if (!sort_fields) {
+                use_sort_fields = g_new0(gchar *, 2);
                 if (album) {
-	                use_sort_fields = g_new0(gchar *, 3);
                         use_sort_fields[0] = MAFW_METADATA_KEY_TRACK;
-                        use_sort_fields[1] = MAFW_METADATA_KEY_TITLE;
                 } else {
-	                use_sort_fields = g_new0(gchar *, 2);
                         use_sort_fields[0] = MAFW_METADATA_KEY_TITLE;
                 }
         } else {

@@ -281,9 +281,6 @@ static void mafw_gst_renderer_init(MafwGstRenderer *self)
 				     "current-frame-on-pause",
 				     G_TYPE_BOOLEAN);
 #endif
-        mafw_extension_add_property(MAFW_EXTENSION(self),
-                                    MAFW_PROPERTY_GST_RENDERER_TV_CONNECTED,
-                                    G_TYPE_BOOLEAN);
  	MAFW_EXTENSION_SUPPORTS_TRANSPORT_ACTIONS(self);
 	renderer->media = g_new0(MafwGstRendererMedia, 1);
 	renderer->media->seekability = SEEKABILITY_UNKNOWN;
@@ -450,8 +447,6 @@ GObject *mafw_gst_renderer_new(MafwRegistry* registry)
 	MAFW_GST_RENDERER(object)->error_policy =
 		MAFW_RENDERER_ERROR_POLICY_CONTINUE;
 
-        MAFW_GST_RENDERER(object)->tv_connected = FALSE;
-
 	/* Setup hal connection for reacting usb cable connected event */
 	dbus_error_init(&err);
 	conn = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
@@ -490,13 +485,12 @@ GObject *mafw_gst_renderer_new(MafwRegistry* registry)
 
         /* Initializes blanking policy */
         jackets = libhal_find_device_by_capability(ctx,
-                                                   "input.jack.video-out",
+                                                   "input.jack.videoout",
                                                    &num_jacks, NULL);
 	if (jackets != NULL) {
                 jack = jackets;
                 while (*jack) {
                         if (_tv_out_is_connected(ctx, *jack)) {
-                                MAFW_GST_RENDERER(object)->tv_connected = TRUE;
                                 break;
                         }
                         jack++;
@@ -754,7 +748,7 @@ static gboolean _tv_out_is_connected(LibHalContext *ctx, const char *udi)
         }
 
         jack_types = libhal_device_get_property_strlist(ctx, udi,
-                                                        "input.jack.type",
+                                                        "input.jacket.type",
                                                         NULL);
         if (jack_types == NULL) {
                 return FALSE;
@@ -762,7 +756,7 @@ static gboolean _tv_out_is_connected(LibHalContext *ctx, const char *udi)
 
         jack = jack_types;
         while (*jack) {
-                if (strcmp(*jack, "video-out") == 0) {
+                if (strcmp(*jack, "videoout") == 0) {
                         is_tv_out_jack = TRUE;
                         break;
                 } else {
@@ -779,29 +773,9 @@ static void _property_modified(LibHalContext *ctx, const char *udi,
                                const char *key, dbus_bool_t is_removed,
                                dbus_bool_t is_added)
 {
-        MafwGstRenderer *renderer;
-        gboolean connected;
-        GValue value = { 0 };
-
         /* Check if the property changed affects the jack */
         if (strcmp(key, "input.jack.type") == 0) {
-                g_debug("HAL property modified! jack changed\n");
-                connected = _tv_out_is_connected(ctx, udi);
-                renderer = MAFW_GST_RENDERER(libhal_ctx_get_user_data(ctx));
-                if (renderer->tv_connected != connected) {
-                        /* Notify the change */
-                        renderer->tv_connected = connected;
-                        g_value_init(&value, G_TYPE_BOOLEAN);
-                        g_value_set_boolean(&value, renderer->tv_connected);
-                        mafw_extension_emit_property_changed(
-                                MAFW_EXTENSION(renderer),
-                                MAFW_PROPERTY_GST_RENDERER_TV_CONNECTED,
-                                &value);
-                        g_value_unset(&value);
-                }
-                blanking_control(connected == FALSE);
-        } else {
-                g_debug("HAL propertiy modified, but not a jack\n");
+                blanking_control(_tv_out_is_connected(ctx, udi) == FALSE);
         }
 }
 
@@ -930,14 +904,11 @@ static void _signal_transport_actions_property_changed(MafwGstRenderer * self)
 			self->states[self->current_state]),
 		MAFW_PROPERTY_RENDERER_TRANSPORT_ACTIONS);
 
-        if (value) {
-                mafw_extension_emit_property_changed(
-                        MAFW_EXTENSION(self),
-                        MAFW_PROPERTY_RENDERER_TRANSPORT_ACTIONS,
-                        value);
-                g_value_unset(value);
-                g_free(value);
-        }
+	mafw_extension_emit_property_changed(
+		MAFW_EXTENSION(self),
+		MAFW_PROPERTY_RENDERER_TRANSPORT_ACTIONS,
+		value);
+
 }
 
 
@@ -2104,12 +2075,6 @@ static void mafw_gst_renderer_get_property(MafwExtension *self,
 		g_value_set_boolean(value, current_frame_on_pause);
 	}
 #endif
-        else if (!strcmp(key,
-                         MAFW_PROPERTY_GST_RENDERER_TV_CONNECTED)) {
-                value = g_new0(GValue, 1);
-                g_value_init(value, G_TYPE_BOOLEAN);
-                g_value_set_boolean(value, renderer->tv_connected);
-        }
 	else if (!strcmp(key,
 			 MAFW_PROPERTY_RENDERER_TRANSPORT_ACTIONS)){
 		/* Delegate in the state. */
