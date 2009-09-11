@@ -1,14 +1,8 @@
-libmafw (0.1.2009.37-1) unstable; urgency=low
-
-  * MAFW, pre-release 0.1.2009.37-1
-
- -- Juha Kellokoski <veitikka6@gmail.com>  Fri, 04 Sep 2009 12:00:00 +0300
-
 libmafw (0.1.2009.35-3) unstable; urgency=low
 
-  * MAFW Sales RC4.
+  * Version increased.
 
- -- Juha Kellokoski <veitikka6@gmail.com>  Tue, 25 Aug 2009 14:15:34 +0300
+ -- Mika Tapojärvi <ext-mika.tapojarvi@nokia.com>  Fri, 21 Aug 2009 20:32:38 +0300
 
 libmafw (0.1.2009.35-2) unstable; urgency=low
 

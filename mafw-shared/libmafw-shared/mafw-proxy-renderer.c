@@ -1079,8 +1079,6 @@ GObject *mafw_proxy_renderer_new(const gchar *uuid, const gchar *plugin,
 	dbus_connection_setup_with_g_main(connection, NULL);
 	proxy_extension_attach(G_OBJECT(new_obj), connection, plugin, registry);
 
-	g_free(path);
-
 	return new_obj;
 
 renderer_new_error:
@@ -1088,7 +1086,6 @@ renderer_new_error:
 	if (connection)
 		dbus_connection_unref(connection);
 
-        g_free(path);
 	g_object_unref(new_obj);
 	return NULL;
 }
