@@ -791,6 +791,7 @@ extern GHashTable *mafw_metadata_new(void);
 extern void mafw_metadata_release(GHashTable *md);
 extern void mafw_metadata_add_something(GHashTable *md, const gchar *key,
 					GType argvtype, guint nvalues, ...);
+
 extern guint mafw_metadata_nvalues(gconstpointer value);
 extern GValue *mafw_metadata_first(GHashTable *md, const gchar *key);
 

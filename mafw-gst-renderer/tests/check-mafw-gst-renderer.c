@@ -177,7 +177,11 @@ static void metadata_changed_cb(MafwRenderer *self, const gchar *key,
 	{
 		GValue *original;
 
-		original = g_value_array_get_nth(value, 0);
+		if (G_IS_VALUE(value)) {
+			original = (GValue *) value;
+		} else {
+			original = g_value_array_get_nth(value, 0);
+		}
 
 		m->value = g_new0(GValue, 1);
 		g_value_init(m->value, G_VALUE_TYPE(original));
@@ -702,7 +706,7 @@ START_TEST(test_basic_playback)
 	fail_if(bus == NULL, "No GstBus");
 
 	message = gst_message_new_duration(NULL, GST_FORMAT_TIME,
-					   5 * GST_SECOND);
+					   3 * GST_SECOND);
 	gst_bus_post(bus, message);
 
 	if (wait_for_metadata(&m, wait_tout_val) == FALSE) {
@@ -3957,7 +3961,6 @@ START_TEST(test_properties_management)
 		"Property with value %d and %d expected",
 		g_value_get_uint(c.property_received), 50);
 
-#ifndef MAFW_GST_RENDERER_DISABLE_PULSE_VOLUME
 	/* Test reconnection to pulse */
 
 	pa_context_disconnect(pa_context_get_instance());
@@ -3987,7 +3990,6 @@ START_TEST(test_properties_management)
 	p.expected = NULL;
 
 	reset_callback_info(&c);
-#endif
 }
 END_TEST
 
