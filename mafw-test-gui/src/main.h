@@ -34,6 +34,4 @@ void mtg_print_signal (MafwExtension* origin, const gchar* signal,
 void
 application_exit            (void);
 
-void activate_all(gboolean make_active);
-
 #endif /* __MAIN_H__ */

@@ -34,6 +34,7 @@
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #endif /* MAEMO */
+
 #include <libmafw/mafw.h>
 #include <libgupnp/gupnp.h>
 #include <libgupnp-av/gupnp-av.h>
@@ -44,145 +45,6 @@
 #include "mafw-upnp-source-util.h"
 
 #define MAFW_UPNP_SOURCE_PLUGIN_NAME "MAFW-UPnP-Source"
-
-static void mafw_upnp_source_plugin_gupnp_down(void);
-static void mafw_upnp_source_plugin_gupnp_up(void);
-static gboolean network_up;
-
-G_DEFINE_TYPE(MafwUpnpControlSource, mafw_upnp_control_source, MAFW_TYPE_SOURCE);
-
-#define SHUTDOWN_TIMEOUT	3
-
-static guint shutdown_timeout_id;
-
-static gboolean _shutdown_gssdp(MafwUpnpControlSource *controlsrc)
-{
-	mafw_upnp_source_plugin_gupnp_down();
-	shutdown_timeout_id = 0;
-	return FALSE;
-}
-
-#define CONTROL_SRC_DEFAULT_ERRORMSG "This source is only to disable/enable "\
-			"the network monitoring. You can do this through the " \
-			"\"activate\" boolean variable"
-
-static guint mafw_upnp_control_source_browse(MafwSource *self,
-				const gchar *object_id, gboolean recursive,
-				const MafwFilter *filter,
-				const gchar *sort_criteria,
-				const gchar *const *mdkeys,
-				guint skip_count, guint item_count,
-				MafwSourceBrowseResultCb cb, gpointer user_data)
-{
-	if (cb != NULL)
-	{
-		GError *error = NULL;
-		g_set_error(&error,
-			    MAFW_EXTENSION_ERROR,
-		    	MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-		    	CONTROL_SRC_DEFAULT_ERRORMSG);
-		cb(self, MAFW_SOURCE_INVALID_BROWSE_ID, 0, 0, NULL, NULL,
-					user_data, error);
-		g_error_free(error);
-	}
-	return MAFW_SOURCE_INVALID_BROWSE_ID;
-}
-
-static gboolean mafw_upnp_control_source_cancel_browse(MafwSource *self, guint browse_id,
-				  GError **error)
-{
-	if (error)
-	{
-		g_set_error(error,
-			    MAFW_EXTENSION_ERROR,
-			    MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-			    CONTROL_SRC_DEFAULT_ERRORMSG);
-	}
-	return FALSE;
-}
-
-static void mafw_upnp_control_source_get_metadata(MafwSource *self,
-						const gchar *object_id,
-						const gchar *const *mdkeys,
-						MafwSourceMetadataResultCb cb,
-						gpointer user_data)
-{
-	if (cb != NULL)
-	{
-		GError *error = NULL;
-		g_set_error(&error,
-			    MAFW_EXTENSION_ERROR,
-			    MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-			    CONTROL_SRC_DEFAULT_ERRORMSG);
-		cb(self, object_id, NULL, user_data, error);
-		g_error_free(error);
-	}
-}
-
-static void mafw_upnp_control_source_set_property(MafwExtension *self,
-					 const gchar *key,
-					 const GValue *value)
-{
-	MafwUpnpControlSource *controlsrc = MAFW_UPNP_CONTROL_SOURCE(self);
-
-	g_return_if_fail(key != NULL);
-
-	if (!strcmp(key, MAFW_PROPERTY_EXTENSION_ACTIVATE)) {
-		gboolean activate = g_value_get_boolean(value);
-		
-		if (activate == controlsrc->activate)
-			return;
-
-		if (activate)
-		{
-			if (shutdown_timeout_id)
-			{
-				g_source_remove(shutdown_timeout_id);
-				shutdown_timeout_id = 0;
-			}
-			else
-			{
-				if (network_up)
-					mafw_upnp_source_plugin_gupnp_up();
-			}
-		}
-		else
-		{
-			shutdown_timeout_id = g_timeout_add_seconds(SHUTDOWN_TIMEOUT,
-							(GSourceFunc)_shutdown_gssdp,
-							self);
-		}
-		
-		controlsrc->activate = activate;
-		mafw_extension_emit_property_changed(self, MAFW_PROPERTY_EXTENSION_ACTIVATE,
-							value);
-	}
-}
-
-static void mafw_upnp_control_source_class_init(MafwUpnpControlSourceClass *klass)
-{
-	MAFW_EXTENSION_CLASS(klass)->set_extension_property =
-		(gpointer) mafw_upnp_control_source_set_property;
-	MAFW_SOURCE_CLASS(klass)->browse = mafw_upnp_control_source_browse;
-	MAFW_SOURCE_CLASS(klass)->cancel_browse = mafw_upnp_control_source_cancel_browse;
-	MAFW_SOURCE_CLASS(klass)->get_metadata =mafw_upnp_control_source_get_metadata;
-}
-
-static void mafw_upnp_control_source_init(MafwUpnpControlSource *source)
-{
-	MAFW_EXTENSION_SUPPORTS_ACTIVATE(MAFW_EXTENSION(source));
-}
-
-GObject* mafw_upnp_control_source_new(void)
-{
-	GObject* object;
-	object = g_object_new(mafw_upnp_control_source_get_type(),
-			      "plugin", MAFW_UPNP_SOURCE_PLUGIN_NAME,
-			      "uuid", MAFW_UPNP_CONTROL_SOURCE_UUID,
-			      "name", "MAFW-UPnP-Control-Source",
-			      NULL);
-	return object;
-}
 
 /** Maximum number of items requested at a time */
 #define DEFAULT_REQUESTED_COUNT 500
@@ -208,7 +70,6 @@ GObject* mafw_upnp_control_source_new(void)
 typedef struct _BrowseArgs BrowseArgs;
 
 static GUPnPDIDLLiteParser* parser;
-
 /*----------------------------------------------------------------------------
   Static prototypes
   ----------------------------------------------------------------------------*/
@@ -320,7 +181,7 @@ typedef struct _MafwUPnPSourcePlugin {
 
 /** THE mafw plugin */
 static MafwUPnPSourcePlugin* _plugin = NULL;
-static MafwSource *control_src;
+
 /**
  * mafw_upnp_source_plugin_gupnp_up:
  *
@@ -402,10 +263,9 @@ static void mafw_upnp_source_plugin_conic_event(ConIcConnection* connection,
 			case CON_IC_STATUS_CONNECTED:
 				/* Create GUPnP stuff only for WLAN connections. This prevents
 		   		UPnP traffic in a GSM network. */
-				network_up = TRUE;
+				
 				g_debug("WLAN connection is up.");
-				if (MAFW_UPNP_CONTROL_SOURCE(control_src)->activate)
-					mafw_upnp_source_plugin_gupnp_up();
+				mafw_upnp_source_plugin_gupnp_up();
 				break;
 
 			case CON_IC_STATUS_DISCONNECTED:
@@ -413,14 +273,13 @@ static void mafw_upnp_source_plugin_conic_event(ConIcConnection* connection,
 				   it shouldn't be necessary to check the bearer type here.
 				   If a GSM network was up, this does nothing. Otherwise all
 				   GUPnP stuff is destroyed as it should be. */
-				network_up = FALSE;
 				mafw_upnp_source_plugin_gupnp_down();
 				break;
-
+	
 			case CON_IC_STATUS_DISCONNECTING:
 				/* NOP */
 				break;
-
+		
 			default:
 				g_warning("Unknown network status: %d", status);
 				break;
@@ -451,14 +310,11 @@ void mafw_upnp_source_plugin_initialize(MafwRegistry* registry)
 	if (g_thread_supported() == FALSE)
 		g_thread_init(NULL);
 
-	/* Creating the control source */
-	control_src = MAFW_SOURCE(mafw_upnp_control_source_new());
-	mafw_registry_add_extension(registry, MAFW_EXTENSION(control_src));
 	/* Reset next browse id */
 	_plugin->next_browse_id = 0;
 
 #ifdef HAVE_CONIC /* MAEMO */
-	
+
 	/* Initialize the system bus so libconic can receive ICD messages. */
 	_plugin->dbus_system = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
 	dbus_connection_setup_with_g_main(_plugin->dbus_system, NULL);
@@ -475,13 +331,12 @@ void mafw_upnp_source_plugin_initialize(MafwRegistry* registry)
 	g_object_set(_plugin->conic, "automatic-connection-events", TRUE, NULL);
 
 	g_debug("Waiting for ConIC to tell, whether network is up.");
-	
-	
 
 #else
+
 	/* We're operating on a non-armel (non-maemo) environment. Assume
 	   network is up and running. */
-	network_up = TRUE;
+	mafw_upnp_source_plugin_gupnp_up();
 
 #endif /* MAEMO */
 }
@@ -500,8 +355,6 @@ void mafw_upnp_source_plugin_deinitialize(void)
 	dbus_connection_unref(_plugin->dbus_system);
 #endif /* MAEMO */
 
-	mafw_registry_remove_extension(_plugin->registry,
-					   MAFW_EXTENSION(control_src));
 	g_object_unref(_plugin->registry);
 	_plugin->registry = NULL;
 
@@ -1386,7 +1239,6 @@ static void mafw_upnp_source_browse_result(GUPnPDIDLLiteParser* parser,
 	args = (BrowseArgs*) user_data;
 	g_assert(args != NULL);
 	g_assert(args->callback != NULL);
-	g_return_if_fail(args->remaining_count > 0);
 
 	/* Create a MAFW-style object ID for this item node. If an
 	   ID cannot be found, this node might be a <desc> node, which
@@ -1397,9 +1249,7 @@ static void mafw_upnp_source_browse_result(GUPnPDIDLLiteParser* parser,
 	   which must not be exposed to the user and thus not counted
 	   in skip_count, either. */
 	if (objectid == NULL)
-	{
 		return;
-	}
 
 	/* Gather requested metadata information from DIDL-Lite */
 	metadata = mafw_upnp_source_compile_metadata(args->mdata_keys,
@@ -1407,7 +1257,15 @@ static void mafw_upnp_source_browse_result(GUPnPDIDLLiteParser* parser,
 
 	/* Calculate remaining count and current item's index. */
 	current = args->current++;
-	args->remaining_count--;
+	if (args->item_count == 0) {
+		/* All items were requested. */
+		args->remaining_count = args->total_matches - args->current;
+	} else if (args->number_returned < args->item_count) {
+		args->remaining_count = args->number_returned - args->current;
+	} else {
+		args->remaining_count =	args->item_count - args->current;
+	}
+
 	/* Emit results */
 	args->callback(MAFW_SOURCE(args->source),
 		       args->browse_id,
@@ -1417,7 +1275,6 @@ static void mafw_upnp_source_browse_result(GUPnPDIDLLiteParser* parser,
 		       metadata,
 		       args->user_data,
 		       NULL);
-	
 	/* Free the compiled metadata and MAFW-style object ID */
 	g_hash_table_unref(metadata);
 	g_free(objectid);
@@ -1462,16 +1319,7 @@ static void mafw_upnp_source_browse_cb(GUPnPServiceProxy* service,
 		"\tTotalMatches: %d\n",
 		mafw_extension_get_uuid(MAFW_EXTENSION(args->source)),
 		args->number_returned, args->total_matches);
-	if (args->remaining_count == UINT_MAX)
-	{// Calculate the new remaining count
-		if (args->item_count == 0 ||
-			args->total_matches < args->item_count) {
-		/* All items were requested. */
-			args->remaining_count = args->total_matches;
-		} else {
-			args->remaining_count =	args->item_count;
-		}
-	}
+
 	if (result == FALSE || didl == NULL || args->total_matches == 0)
 	{
 		/* Action failed completely, no results. */
@@ -1515,6 +1363,7 @@ static void mafw_upnp_source_browse_cb(GUPnPServiceProxy* service,
 			mafw_upnp_source_browse_result,
 			args,
 			&gupnp_error);
+
 		if (gupnp_error != NULL)
 		{
 			/* DIDL-Lite parsing failed */
@@ -1524,6 +1373,7 @@ static void mafw_upnp_source_browse_cb(GUPnPServiceProxy* service,
 				    MAFW_SOURCE_ERROR,
 				    MAFW_SOURCE_ERROR_BROWSE_RESULT_FAILED,
 				    "DIDL-Lite parsing failed: %s", gupnp_error->message);
+
 			/* Call the callback function with invalid values and
 			   an error. */
 			if (args->remaining_count > 0)
@@ -1547,7 +1397,7 @@ static void mafw_upnp_source_browse_cb(GUPnPServiceProxy* service,
 		 * 3. All items were requested, or
 		 * 4. the next skip_count won't go beyond the requested count
 		 */
-		else if (args->remaining_count == 0)
+		else if (args->remaining_count <= 0)
 		{
 			/* There are no more items left to browse. Stop. */
 		}
@@ -1806,7 +1656,7 @@ static guint mafw_upnp_source_browse(MafwSource *source,
 	args->callback = browse_cb;
 	args->user_data = user_data;
 	args->browse_id = _plugin->next_browse_id;
-	args->remaining_count = UINT_MAX;
+	args->remaining_count = INT_MAX;
 
 	g_debug("Browse: %s\n"
 		"\tID: %u\n"

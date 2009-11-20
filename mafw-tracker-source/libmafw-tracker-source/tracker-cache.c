@@ -100,7 +100,7 @@ static int _get_childcount_level(const gchar *childcount_key)
         return level;
 }
 
-static GValue *_get_title(TrackerCache *cache, gint index, const gchar *path)
+static GValue *_get_title(TrackerCache *cache, gint index)
 {
         GValue *value_title;
         GValue *value_uri;
@@ -127,15 +127,10 @@ static GValue *_get_title(TrackerCache *cache, gint index, const gchar *path)
 
                 uri_title = (gchar *) g_value_get_string(value_uri);
                 if (IS_STRING_EMPTY(uri_title)) {
-			if (IS_STRING_EMPTY(path))
-                        	return value_title;
-			else
-			{
-				pathname = g_strdup(path);
-			}
+                        return value_title;
                 }
-		else
-	                pathname = g_filename_from_uri(uri_title, NULL, NULL);
+
+                pathname = g_filename_from_uri(uri_title, NULL, NULL);
 
                 /* Get filename */
                 filename = g_path_get_basename(pathname);
@@ -1018,7 +1013,7 @@ tracker_cache_value_get(TrackerCache *cache,
  * Returns: list of MAFW-metadata
  */
 GList *
-tracker_cache_build_metadata(TrackerCache *cache, const gchar **path_list)
+tracker_cache_build_metadata(TrackerCache *cache)
 {
         GList *mafw_list = NULL;
         gchar **user_keys;
@@ -1049,16 +1044,7 @@ tracker_cache_build_metadata(TrackerCache *cache, const gchar **path_list)
                          * it doesn't contain title */
                         if (strcmp(user_keys[key_index],
                                    MAFW_METADATA_KEY_TITLE) == 0) {
-				const gchar *cur_path;
-				if (path_list)
-				{
-					cur_path = path_list[result_index];
-				}
-				else
-				{
-					cur_path = NULL;
-				}
-                                value = _get_title(cache, result_index, cur_path);
+                                value = _get_title(cache, result_index);
                         } else {
                                 value = tracker_cache_value_get(
                                         cache,
