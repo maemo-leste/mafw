@@ -60,7 +60,7 @@ dnl Default compile flags.  (NOTE: CFLAGS is reserved for the user!)
 AC_SUBST([_CFLAGS])
 AC_SUBST([_LDFLAGS])
 _CFLAGS="-Wall -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations"
-_CFLAGS="$_CFLAGS -ggdb3"
+_CFLAGS="$_CFLAGS -g"
 
 dnl Configure-time options.
 
