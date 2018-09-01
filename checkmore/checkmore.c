@@ -453,8 +453,9 @@ void checkmore_add_aborting_test(TCase *tc, TFun fun)
 int checkmore_run(SRunner *runner, gboolean nofork)
 {
 	int nfailed;
-
+#if !GLIB_CHECK_VERSION(2,35,0)
 	g_type_init();
+#endif
 	mafw_log_init(NULL);
 
 	/* In certain cases you may require or simply prefer nonforking. */

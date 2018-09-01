@@ -148,13 +148,14 @@ static void mymd(MafwSource *self,
 static void gotitem(MafwPlaylist *pls, guint index, const gchar *object_id,
 		    GHashTable *metadata, gpointer n)
 {
-	g_print("%d: got md %u. %s\n", (guint)n, index, object_id);
+	g_print("%d: got md %u. %s\n", GPOINTER_TO_INT(n), index, object_id);
 }
 
 static void reqdone(gpointer n)
 {
-	g_print("%d: finished\n", (guint)n);
-	Reqs[(guint)n] = NULL;
+	gint _n = GPOINTER_TO_INT(n);
+	g_print("%d: finished\n", _n);
+	Reqs[_n] = NULL;
 }
 
 static G_GNUC_UNUSED gboolean cancelidle(gpointer req)
@@ -217,7 +218,8 @@ static gboolean process_cmd(GIOChannel *ioc, GIOCondition cond, gpointer _)
 #else
 						      NULL,
 #endif
-						      gotitem, (gpointer)n,
+						      gotitem,
+						      GINT_TO_POINTER(n),
 						      reqdone);
 #if FMPBUG
 		g_idle_add(cancelidle, Reqs[n]);

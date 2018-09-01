@@ -42,7 +42,8 @@ lib_LTLIBRARIES			= test-extension.la
 
 AM_CFLAGS			= $(_CFLAGS)
 AM_CPPFLAGS			= $(GLIB_CFLAGS) $(CHECK_CFLAGS) \
-				  -I$(top_srcdir) -I$(top_srcdir)/checkmore
+				  -I$(top_srcdir) -I$(top_srcdir)/checkmore \
+				  -DGLIB_DISABLE_DEPRECATION_WARNINGS
 AM_LDFLAGS			= $(_LDFLAGS)
 LDADD				= $(top_builddir)/libmafw/libmafw.la \
 				  $(top_builddir)/checkmore/libcheckmore.la \

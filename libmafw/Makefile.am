@@ -11,7 +11,8 @@ libmafw_la_CFLAGS	= $(_CFLAGS)
 libmafw_la_CPPFLAGS	= $(GLIB_CFLAGS) $(SQLITE_CFLAGS) \
 			  -I$(top_srcdir) \
 			  -DG_LOG_DOMAIN=\"mafw\" \
-			  -DMAFW_PREFIX=\"$(prefix)\"
+			  -DMAFW_PREFIX=\"$(prefix)\" \
+			  -DGLIB_DISABLE_DEPRECATION_WARNINGS
 libmafw_la_LIBADD	= $(SQLITE_LIBS) $(GLIB_LIBS)
 libmafw_la_LDFLAGS	= $(_LDFLAGS) -version-info 0:0:0
 

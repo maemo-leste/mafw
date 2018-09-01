@@ -718,9 +718,12 @@ if (1){	tc = tcase_create("multivalued metadata");
 	tcase_add_test(tc,		test_multikey_gvstr_gvstr);
 	suite_add_tcase(suite, tc);}
 
-if (1)	checkmore_add_tcase(suite, "getting relevant keys", test_relevant_keys);
-if (1)	checkmore_add_tcase(suite, "filter by metadata",   test_filter);
-if (1)	checkmore_add_tcase(suite, "sort by metadata",     test_compare);
+	if (1)	checkmore_add_tcase(suite, "getting relevant keys",
+				    test_relevant_keys);
+	if (1)	checkmore_add_tcase(suite, "filter by metadata",
+				    test_filter);
+	if (1)	checkmore_add_tcase(suite, "sort by metadata",
+				    test_compare);
 
 	return checkmore_run(srunner_create(suite), FALSE);
 } /* }}} */
