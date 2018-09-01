@@ -9,8 +9,8 @@ CFG_OPTS += $(if $(filter lcov,$(DBO)),--enable-coverage)
 %:
 	dh $@ --with autoreconf
 
-override_dh_auto_install:
-	dh_auto_install --destdir=debian/tmp
+ override_dh_autoreconf:
+	dh_autoreconf "NOCONFIGURE=1 ./autogen.sh"
 
 override_dh_auto_configure:
 	dh_auto_configure -- $(CFG_OPTS)
