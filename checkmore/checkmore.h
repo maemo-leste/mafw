@@ -98,13 +98,14 @@ extern guint	CheckMore_expect_fallback;
 extern void	checkmore_set_absolute_env(const gchar *key,
 					   const gchar *fname);
 extern void	checkmore_redirect(char const *fname);
+extern void	checkmore_redirect_nobuffer(char const *fname);
 extern void	checkmore_ignore(gchar const *pat);
 
-extern TCase   *checkmore_add_tcase(Suite *suite, char const *name, TFun fun);
+extern TCase	*checkmore_add_tcase(Suite *suite, char const *name, TFun fun);
 extern void	checkmore_add_aborting_test(TCase *tc, TFun fun);
 extern int	checkmore_run(SRunner *runner, gboolean nofork);
 
-extern void     checkmore_unfakeroot(void);
+extern void	checkmore_unfakeroot(void);
 extern void	checkmore_wants_dbus(void);
 
 extern void	checkmore_start(const gchar *path, gint ok_code,
@@ -113,8 +114,8 @@ extern void	checkmore_stop(void);
 extern gboolean	checkmore_child_died(int status, const gchar *who,
 				     int ok_code);
 
-extern void     checkmore_spin_loop(gint time);
-extern void     checkmore_stop_loop(void);
+extern void	checkmore_spin_loop(gint time);
+extern void	checkmore_stop_loop(void);
 
 /* vi: set noexpandtab ts=8 sw=8 cino=t0,(0: */
 #endif /* ! CHECKMORE_H */

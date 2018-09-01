@@ -10,7 +10,7 @@ lib_LTLIBRARIES			= libcheckmore.la
 libcheckmore_la_SOURCES		= checkmore.c
 libcheckmore_la_CPPFLAGS	= $(GLIB_CFLAGS) $(CHECK_CFLAGS) \
 				  -I$(top_srcdir)
-libcheckmore_la_LDFLAGS		= $(_LDFLAGS)
+libcheckmore_la_LDFLAGS		= -version-info 0:2:0 $(_LDFLAGS)
 libcheckmore_la_LIBADD		= $(GLIB_LIBS) -lcheck_pic
 
 headersdir			= $(includedir)

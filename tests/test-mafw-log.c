@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <glib.h>
 #include <check.h>
@@ -38,12 +39,12 @@ START_TEST(test_logging)
 {
 	FILE *st;
 	char line[128];
-
+	setenv("G_MESSAGES_DEBUG","all", TRUE);
 	/* Set the filter to test with. */
 	mafw_log_init(":message,foo:-,bar:debug");
 
 	/* Print some messages to the indicated file. */
-	checkmore_redirect("test.log");
+	checkmore_redirect_nobuffer("test.log");
 
 	g_debug   ("dddddddddddddddddddddddddddddddd");
 	g_info    ("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");

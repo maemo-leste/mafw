@@ -391,12 +391,33 @@ void checkmore_set_absolute_env(const gchar *key, const gchar *fname)
  * NOP. */
 void checkmore_redirect(char const *fname)
 {
-	int pipefd[2] = { 1, 2 };
+	if (fname) {
+		if (!freopen(fname, "a", stderr))
+			g_error("%s: %m", fname);
 
-	if (fname && !freopen(fname, "a", stderr))
-		g_error("%s: %m", fname);
-	if (fname && !freopen(fname, "a", stdout))
-		g_error("%s: %m", fname);
+		if (!freopen(fname, "a", stdout))
+			g_error("%s: %m", fname);
+	}
+}
+
+/**
+ * Same as %checkmore_redirect but disables buffering on the output file.
+ * Useful if you want to check the file content before it is closed */
+void checkmore_redirect_nobuffer(char const *fname)
+{
+	FILE *fp = NULL;
+
+	if (fname) {
+		if ((fp = freopen(fname, "a", stderr)))
+			setbuf(fp, NULL);
+		else
+			g_error("%s: %m", fname);
+
+		if ((fp = freopen(fname, "a", stdout)))
+			setbuf(fp, NULL);
+		else
+			g_error("%s: %m", fname);
+	}
 }
 
 /**
