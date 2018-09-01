@@ -29,11 +29,11 @@ MAINTAINERCLEANFILES		= aclocal.m4 compile config.guess config.sub \
 
 # Keep the mime database up-to-date.
 install-data-hook:
-	$(UPDATEMIME) "$(DESTDIR)$(datadir)/mime";
-	$(UPDATEDESKTOP);
+	-$(UPDATEMIME) "$(DESTDIR)$(datadir)/mime";
+	-$(UPDATEDESKTOP);
 uninstall-hook:
-	$(UPDATEMIME) "$(DESTDIR)$(datadir)/mime";
-	$(UPDATEDESKTOP);
+	-$(UPDATEMIME) "$(DESTDIR)$(datadir)/mime";
+	-$(UPDATEDESKTOP);
 # We are not supposed to delete the whole directory on uninstall.
 distuninstallcheck_listfiles	= find . \
 				  -name "$(DESTDIR)$(datadir)/mime" -prune \
