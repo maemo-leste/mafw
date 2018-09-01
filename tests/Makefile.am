@@ -46,7 +46,7 @@ AM_CPPFLAGS			= $(GLIB_CFLAGS) $(CHECK_CFLAGS) \
 AM_LDFLAGS			= $(_LDFLAGS)
 LDADD				= $(top_builddir)/libmafw/libmafw.la \
 				  $(top_builddir)/checkmore/libcheckmore.la \
-				  $(GLIB_LIBS) $(CHECK_LIBS)
+				  $(GLIB_LIBS) $(CHECK_LIBS) $(SQLITE_LIBS)
 
 test_extension_la_SOURCES	= test-extension.c nopsource.c
 # Trick automake into prefixing nopsource.o, otherwise we are libfooled.
