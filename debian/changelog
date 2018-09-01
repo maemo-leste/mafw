@@ -1,3 +1,9 @@
+libmafw (0.3.2) unstable; urgency=low
+
+  * fix docs build
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Sat, 01 Sep 2018 19:46:42 +0300
+
 libmafw (0.3.1) unstable; urgency=low
 
   * port to debhelper 9
