@@ -2,26 +2,21 @@ Source: libmafw
 Section: misc
 Priority: optional
 Maintainer: Mika Tapojarvi <mika.tapojarvi@sse.fi>
-Build-Depends: debhelper (>= 5), libglib2.0-dev (>= 2.15), libsqlite3-dev, check, gtk-doc-tools, shared-mime-info
+Build-Depends: debhelper (>= 9), libglib2.0-dev (>= 2.15), libsqlite3-dev, check, gtk-doc-tools, shared-mime-info
 Standards-Version: 3.7.2
 
 Package: libmafw0
 Section: libs
 Architecture: any
+Multi-Arch: same
 Depends: ${shlibs:Depends}, shared-mime-info, gvfs-backends
 Description: MAFW UI library
  Media Application framework UI library.
 
-Package: libmafw0-dbg
-Architecture: any
-Depends: libmafw0 (= ${binary:Version})
-Priority: extra
-Description: Debug symbols for libmafw
- Makes debugging a pleasure.
-
 Package: libmafw0-dev
-Architecture: all
+Architecture: any
 Section: libdevel
+Multi-Arch: same
 Depends: libmafw0 (= ${binary:Version}), libglib2.0-dev (>= 2.15), libsqlite3-dev
 Description: MAFW development package
  Development headers for libmafw.
@@ -29,6 +24,7 @@ Description: MAFW development package
 Package: libmafw-doc
 Architecture: all
 Section: doc
+Multi-Arch: foreign
 Suggests: libmafw0
 Description: Documentation for the MAFW UI library
  Contains the generated gtk-doc documentation.
@@ -36,6 +32,7 @@ Description: Documentation for the MAFW UI library
 Package: mafw-all
 Architecture: all
 Section: misc
+Multi-Arch: foreign
 Depends: mafw-dbus-daemon, mafw-playlist-daemon, mafw-tracker-source,
          mafw-gst-renderer, mafw-upnp-source, mafw-iradio-source
 Description: Sensible MAFW runtime

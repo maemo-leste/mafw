@@ -1,2 +1,2 @@
-usr/lib/libmafw.so.*
+usr/lib/*/libmafw.so.*
 usr/share/mime/packages/*
