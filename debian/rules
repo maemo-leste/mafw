@@ -3,9 +3,9 @@
 #export DH_VERBOSE=1
 
 CFG_OPTS := --disable-dependency-tracking --prefix=/usr --enable-static
-CFG_OPTS += $(if $(filter nocheck,$(DBO)),--disable-tests,--enable-tests)
-CFG_OPTS += $(if $(filter nodoc,$(DBO)),--disable-gtk-doc,--enable-gtk-doc)
-CFG_OPTS += $(if $(filter lcov,$(DBO)),--enable-coverage)
+CFG_OPTS += $(if $(filter nocheck,$(DEB_BUILD_OPTIONS)),--disable-tests,--enable-tests)
+CFG_OPTS += $(if $(filter nodoc,$(DEB_BUILD_OPTIONS)),--disable-gtk-doc,--enable-gtk-doc)
+CFG_OPTS += $(if $(filter lcov,$(DEB_BUILD_OPTIONS)),--enable-coverage)
 %:
 	dh $@ --with autoreconf
 
