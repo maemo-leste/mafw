@@ -1,3 +1,9 @@
+libmafw (0.3.3) unstable; urgency=low
+
+  * use correct var in debian/rules
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Sun, 02 Sep 2018 16:26:22 +0300
+
 libmafw (0.3.2) unstable; urgency=low
 
   * fix docs build
