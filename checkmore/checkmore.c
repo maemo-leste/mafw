@@ -450,13 +450,13 @@ void checkmore_ignore(gchar const *pat)
  * Useful when you are defining test cases with a single test, so you
  * can disable it more easily.
  */
-TCase *checkmore_add_tcase(Suite *suite, char const *name, TFun fun)
+TCase *checkmore_add_tcase(Suite *suite, char const *name, const TTest *test)
 {
 	TCase *tcase;
 
 	tcase = tcase_create(name);
 	suite_add_tcase(suite, tcase);
-	tcase_add_test(tcase, fun);
+	tcase_add_test(tcase, test);
 
 	return tcase;
 }

@@ -101,7 +101,8 @@ extern void	checkmore_redirect(char const *fname);
 extern void	checkmore_redirect_nobuffer(char const *fname);
 extern void	checkmore_ignore(gchar const *pat);
 
-extern TCase	*checkmore_add_tcase(Suite *suite, char const *name, TFun fun);
+extern TCase	*checkmore_add_tcase(Suite *suite, char const *name,
+				     const TTest *test);
 extern void	checkmore_add_aborting_test(TCase *tc, TFun fun);
 extern int	checkmore_run(SRunner *runner, gboolean nofork);
 
