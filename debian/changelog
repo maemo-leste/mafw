@@ -1,3 +1,9 @@
+libmafw (0.3.4) unstable; urgency=low
+
+  * checkmore: checkmore_add_tcase: tcase_add_test() takes TTest *, not TFun
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Sat, 10 Dec 2022 09:07:52 +0200
+
 libmafw (0.3.3) unstable; urgency=low
 
   * use correct var in debian/rules
