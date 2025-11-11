@@ -462,7 +462,7 @@ TCase *checkmore_add_tcase(Suite *suite, char const *name, const TTest *test)
 }
 
 /** Adds @fun expected to be abort()ed by g_assert() to @tc. */
-void checkmore_add_aborting_test(TCase *tc, TFun fun)
+void checkmore_add_aborting_test(TCase *tc, TTest *fun)
 {
 	tcase_add_test_raise_signal(tc, fun, SIGABRT);
 }
